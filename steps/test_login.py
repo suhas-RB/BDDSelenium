@@ -16,6 +16,11 @@ def test_valid_login():
     print("test_valid_login")
 
 
+@scenario("invalid login")
+def test_invalid_login():
+    print("test_invalid_login")
+
+
 @given("login page is displayed")
 def login_page_displayed(driver):
     title1 = driver.title
@@ -50,4 +55,16 @@ def home_page_displayed(driver):
 
     except:
         print("Home page is not displayed")
+        assert False
+
+
+@then("error msg should be displayed")
+def error_msg_displayed(driver):
+    try:
+        wait = WebDriverWait(driver, 10)
+        wait.until(expected_conditions.visibility_of_element_located((By.XPATH,"//span[contains(text(),'invalid')]")))
+        print("error msg is displayed")
+
+    except:
+        print("error msg is not displayed")
         assert False
