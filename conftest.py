@@ -8,7 +8,7 @@ from selenium.webdriver.chrome.service import Service
 def browser_is_opened():
     print("open the chrome browser")
     driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-
+    driver.maximize_window()
     return driver
 
 
@@ -16,3 +16,11 @@ def browser_is_opened():
 def enter_the_url(driver,url):
     print("Enter the url",url)
     driver.get(url)
+
+
+
+def pytest_bdd_step_error(request, feature, scenario, step, step_func, step_func_args, exception):
+    driver1=request.getfixturevalue('driver')
+    print("*inside failed scenario*")
+    driver1.save_screenshot("./screenshots/s1.png")
+    driver1.close()
