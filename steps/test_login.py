@@ -8,6 +8,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
+from page.login_page import LoginPage
+from page.Enter_time_track_page import EnterTimeTrackPage
+
+
+
 scenario = partial(pytest_bdd.scenario, "login.feature")
 
 
@@ -21,50 +26,45 @@ def test_invalid_login():
     print("test_invalid_login")
 
 
-@given("login page is displayed")
+@given("login page is displayed",target_fixture='login_page')
 def login_page_displayed(driver):
-    title1 = driver.title
-    assert "Login" in title1
-
+    login_page=LoginPage(driver)
+    wait=WebDriverWait(driver,10)
+    result=login_page.verify_loginpage_is_displayed(wait)
+    assert result
+    return login_page
     print("login page displayed")
 
 
 @when(parsers.parse("we enter {un} in username"))
-def enter_username(driver, un):
-    driver.find_element(By.ID, "username").send_keys(un)
+def enter_username(login_page, un):
+    #driver.find_element(By.ID, "username").send_keys(un)
+    login_page.set_username(un)
 
 
 @when(parsers.parse("we enter {pw} in password"))
-def enter_pwd(driver, pw):
-    driver.find_element(By.NAME, "pwd").send_keys(pw)
+def enter_pwd(login_page, pw):
+    #driver.find_element(By.NAME, "pwd").send_keys(pw)
+    login_page.set_password(pw)
 
 
 @when("we click on login button")
-def click_login_button(driver):
-    print("click login button")
-
-    driver.find_element(By.XPATH, "//div[.='Login ']").click()
+def click_login_button(login_page):
+    #driver.find_element(By.XPATH, "//div[.='Login ']").click()
+    login_page.click_loginbutton()
 
 
 @then("home page should be displayed")
 def home_page_displayed(driver):
-    try:
-        wait = WebDriverWait(driver, 10)
-        wait.until(expected_conditions.title_contains("Time-Track"))
-        print("Home page is displayed")
-
-    except:
-        print("Home page is not displayed")
-        assert False
-
+    wait = WebDriverWait(driver, 10)
+    home_page=EnterTimeTrackPage(driver)
+    result=home_page.verify_homepage_is_displayed(wait)
+    assert result
+    print("home page is displayed")
 
 @then("error msg should be displayed")
-def error_msg_displayed(driver):
-    try:
-        wait = WebDriverWait(driver, 10)
-        wait.until(expected_conditions.visibility_of_element_located((By.XPATH,"//span[contains(text(),'invalid')]")))
-        print("error msg is displayed")
-
-    except:
-        print("error msg is not displayed")
-        assert False
+def error_msg_displayed(login_page,driver):
+    wait = WebDriverWait(driver, 10)
+    result=login_page.verify_err_msg_displayed(wait)
+    assert result
+    print("error msg is displayed")
